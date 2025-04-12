@@ -1,25 +1,13 @@
 {
-	"compilerOptions": {
-	  "sourceMap": true,
-	  "module": "esnext",
-	  "esModuleInterop": true,
-	  "experimentalDecorators": true,
-	  "target": "es2017",
-	  "jsx": "react",
-	  "strictPropertyInitialization": true,
-	  "strictNullChecks": true,
-	  "strictBindCallApply": true,
-	  "removeComments": false,
-	  "pretty": true,
-	  "declaration": true,
-	  "declarationDir": "./declarations/",
-	  "lib": [
-		"dom",
-		"es6",
-	  ],
-	  "alwaysStrict": true,
-	  "outDir": "./dist/",
-	  "rootDir": "./src/"
-	},
-	"compileOnSave": true
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "strict": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true
+  },
+  "include": ["src"]
 }

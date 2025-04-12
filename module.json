@@ -1,17 +1,13 @@
 {
-	"name": "truerng",
-	"title": "True RNG",
-	"description": "Replaces the default random number generator with api calls to random.org. Providing truly random dice rolls. API Key Needed.",
-	"version": "1.0.6",
-	"author": "KiD Fearless",
-	"minimumCoreVersion": "0.7.9",
-	"compatibleCoreVersion": "0.8.6",
-	"esmodules": [
-		"dist/TrueRNG.js"
-	],
-	"readme": "https://raw.githubusercontent.com/kidfearless/Foundry-TrueRNG/master/README.md",
-	"bugs": "https://github.com/kidfearless/Foundry-TrueRNG/issues",
-	"url": "https://github.com/kidfearless/Foundry-TrueRNG",
-	"manifest": "https://raw.githubusercontent.com/kidfearless/Foundry-TrueRNG/master/module.json",
-	"download": "https://github.com/kidfearless/Foundry-TrueRNG/archive/refs/tags/v1.0.6.zip"
+  "name": "truerng",
+  "title": "TrueRNG",
+  "description": "Use a true random number generator from random.org for dice rolls.",
+  "version": "2.0.0",
+  "author": "antipop001 (forked from kidfearless)",
+  "minimumCoreVersion": "12",
+  "compatibleCoreVersion": "12",
+  "scripts": ["scripts/truerng.js"],
+  "url": "https://github.com/antipop001/Foundry-TrueRNG",
+  "manifest": "https://raw.githubusercontent.com/antipop001/Foundry-TrueRNG/main/module.json",
+  "download": "https://github.com/antipop001/Foundry-TrueRNG/archive/refs/heads/main.zip"
 }

@@ -28,3 +28,20 @@ This at least makes it so that the rolls you get are determined at the start, th
 
 If you like this repo and want to support me you can always buy me a pizza 😁
 <a href="https://www.buymeacoffee.com/kidfearless" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-violet.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
+# TrueRNG for Foundry VTT
+
+This module replaces Foundry's built-in RNG with true random numbers from [random.org](https://random.org).
+
+## Installation
+
+Use this manifest URL:
+```
+https://raw.githubusercontent.com/antipop001/Foundry-TrueRNG/master/module.json
+```
+
+## Features
+
+- Uses `random.org` API for atmospheric randomness
+- Caches results to reduce API load
+- Toggle module via UI button
+- Optional API key usage

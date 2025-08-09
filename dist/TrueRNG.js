@@ -37,7 +37,7 @@ export class TrueRNG {
         document.body.appendChild(style);
         const quickToggleButton = document.createElement("a");
         const outerDiv = document.querySelector("#chat-controls");
-        const firstChild = document.querySelector("#chat-controls > .chat-control-icon");
+        const firstChild = outerDiv?.firstElementChild;
         quickToggleButton.id = "TrueRNGQuickToggleButton";
         quickToggleButton.title = "Toggle the TrueRNG module";
         quickToggleButton.classList.add("trquickbutton", enabled ? "trvisible" : "trhidden");
@@ -47,7 +47,9 @@ export class TrueRNG {
             game.settings.set("truerng", "ENABLED", !isEnabled);
             quickToggleButton.innerHTML = isEnabled ? "OFF" : "ON";
         });
-        outerDiv?.insertBefore(quickToggleButton, firstChild);
+        if (outerDiv) {
+            outerDiv.insertBefore(quickToggleButton, firstChild);
+        }
         this.QuickToggleButton = quickToggleButton;
     }
     UpdateRandomNumbers() {

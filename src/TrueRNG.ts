@@ -56,7 +56,7 @@ export class TrueRNG {
 
         const quickToggleButton = document.createElement("a");
         const outerDiv = document.querySelector("#chat-controls");
-        const firstChild = document.querySelector("#chat-controls > .chat-control-icon");
+        const firstChild = outerDiv?.firstElementChild;
 
         quickToggleButton.id = "TrueRNGQuickToggleButton";
         quickToggleButton.title = "Toggle the TrueRNG module";
@@ -69,7 +69,9 @@ export class TrueRNG {
             quickToggleButton.innerHTML = isEnabled ? "OFF" : "ON";
         });
 
-        outerDiv?.insertBefore(quickToggleButton, firstChild);
+        if (outerDiv) {
+            outerDiv.insertBefore(quickToggleButton, firstChild);
+        }
         this.QuickToggleButton = quickToggleButton;
     }
 

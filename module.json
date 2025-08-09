@@ -1,5 +1,5 @@
 {
-  "name": "truerng",
+  "id": "truerng",
   "title": "TrueRNG",
   "description": "Use a true random number generator from random.org for dice rolls.",
   "version": "2.1.0",

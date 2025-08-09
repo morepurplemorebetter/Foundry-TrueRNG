@@ -52,4 +52,3 @@ Hooks.on("ready", () => {
     //#endregion
     Debug.WriteLine(`All test have passed!!!`);
 });
-//# sourceMappingURL=Tests.js.map

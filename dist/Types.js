@@ -6,4 +6,3 @@ export class Ref {
         this.Reference = value;
     }
 }
-//# sourceMappingURL=Types.js.map

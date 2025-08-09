@@ -11,4 +11,3 @@ export class JsonRPCResponse {
         this.jsonrpc = "2.0";
     }
 }
-//# sourceMappingURL=JsonRPC.js.map

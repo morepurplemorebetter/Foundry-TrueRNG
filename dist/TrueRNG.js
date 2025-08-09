@@ -1,268 +1,184 @@
 import { Debug } from "./Debug.js";
 import { RandomAPI } from "./RandomAPI.js";
-import { Ref } from "./Types.js";
-import { LocalStorage } from "./BrowserConfig.js";
-
-/**
- * The main TrueRNG module class
- */
-export class TrueRNGModule {
-  static instance;
-
-  constructor() {
-    if (TrueRNGModule.instance) return TrueRNGModule.instance;
-    TrueRNGModule.instance = this;
-
-    // initialize state
-    this.randomNumbers = [];
-    this.randomGenerator = null;
-    this.originalRandomFunction = Math.random;
-
-    this.awaitingResponse = false;
-    this.maxCachedNumbers = 50;
-    this.updatePoint = 0.5;
-    this.hasAlerted = false;
-    this.enabled = true;
-    this.lastRandomNumber = Math.random();
-    this.quickToggleButton = null;
-
-    this.preRNGEventHandler = null;
-    this.postRNGEventHandler = null;
-  }
-
-  static init() {
-    const mod = new TrueRNGModule();
-    mod.registerSettings();
-    mod.registerHooks();
-  }
-
-  registerSettings() {
-    const register = (key, data) =>
-      game.settings.register("truerng", key, data);
-
-    register("APIKEY", {
-      name: "Random.org API Key",
-      hint: "Put your developer key from https://api.random.org/dashboard here",
-      scope: "world",
-      config: true,
-      type: String,
-      default: "",
-      onChange: (value) => {
-        Debug.WriteLine(`New API KEY: ${value}`);
-        this.updateAPIKey(value);
-      },
-    });
-
-    register("MAXCACHEDNUMBERS", {
-      name: "Max Cached Numbers",
-      hint: "Number of random numbers to pull in per client.",
-      scope: "world",
-      config: true,
-      type: Number,
-      range: { min: 5, max: 200, step: 1 },
-      default: 10,
-      onChange: (value) => {
-        Debug.WriteLine(`New Max Cached Numbers: ${value}`);
-        this.maxCachedNumbers = value;
-      },
-    });
-
-    register("UPDATEPOINT", {
-      name: "Update Point",
-      hint: "Percentage of cached numbers before requesting more.",
-      scope: "world",
-      config: true,
-      type: Number,
-      range: { min: 1, max: 100, step: 1 },
-      default: 50,
-      onChange: (value) => {
-        Debug.WriteLine(`New Update Point: ${value}`);
-        this.updatePoint = parseFloat(value) * 0.01;
-      },
-    });
-
-    register("DEBUG", {
-      name: "Print Debug Messages",
-      hint: "Print debug messages to console",
-      scope: "client",
-      config: true,
-      type: Boolean,
-      default: true,
-      onChange: (value) => {
-        Debug.WriteLine(`Debug mode: ${value}`);
-      },
-    });
-
-    register("ENABLED", {
-      name: "Enabled",
-      hint: "Enable or disable TrueRNG",
-      scope: "world",
-      config: true,
-      type: Boolean,
-      default: true,
-      onChange: (value) => {
-        Debug.WriteLine(`Enabled/Disabled: ${value}`);
-        this.enabled = value;
-      },
-    });
-
-    register("QUICKTOGGLE", {
-      name: "Show Quick Toggle Button",
-      hint: "Show button above chat box to toggle TrueRNG",
-      scope: "client",
-      config: true,
-      type: Boolean,
-      default: true,
-      onChange: (value) => this.toggleQuickButton(value),
-    });
-  }
-
-  registerHooks() {
-    Hooks.once("init", () => this.onInit());
-    Hooks.once("renderChatLog", () => this.onRenderChatLog());
-  }
-
-  onInit() {
-    Debug.WriteLine(`TrueRNGModule initializing...`);
-    this.originalRandomFunction = CONFIG.Dice.randomUniform;
-    CONFIG.Dice.randomUniform = this.getRandomNumber.bind(this);
-
-    // get settings
-    this.enabled = game.settings.get("truerng", "ENABLED");
-    this.maxCachedNumbers = parseInt(game.settings.get("truerng", "MAXCACHEDNUMBERS"));
-    this.updatePoint = parseFloat(game.settings.get("truerng", "UPDATEPOINT")) * 0.01;
-
-    // try to load api key
-    let key = game.settings.get("truerng", "APIKEY");
-    if (key && key.length) {
-      LocalStorage.Set("TrueRNG.ApiKey", key);
-      this.updateAPIKey(key);
-    } else if (LocalStorage.Get("TrueRNG.ApiKey", null)) {
-      let saved = LocalStorage.Get("TrueRNG.ApiKey");
-      game.settings.set("truerng", "APIKEY", saved);
-      this.updateAPIKey(saved);
+import { Ref } from './Types.js';
+import { LocalStorage } from './BrowserConfig.js';
+export class TrueRNG {
+    constructor() {
+        this.RandomNumbers = [];
+        this.RandomGenerator = null;
+        this.OriginalRandomFunction = Math.random;
+        this.PreRNGEventHandler = null;
+        this.PostRNGEventHandler = null;
+        this.AwaitingResponse = false;
+        this.MaxCachedNumbers = 50;
+        this.UpdatePoint = 0.5;
+        this.HasAlerted = false;
+        this.Enabled = true;
+        this.LastRandomNumber = Math.random();
+        this.QuickToggleButton = null;
     }
-  }
-
-  onRenderChatLog() {
-    try {
-      const show = game.settings.get("truerng", "QUICKTOGGLE");
-      this.generateQuickToggleButton(show);
-    } catch (e) {
-      Debug.WriteLine(`Error showing quick toggle: ${e}`);
+    UpdateAPIKey(key) {
+        this.RandomGenerator = new RandomAPI(key);
+        this.UpdateRandomNumbers();
     }
-  }
-
-  updateAPIKey(key) {
-    this.randomGenerator = new RandomAPI(key);
-    this.updateRandomNumbers();
-  }
-
-  updateRandomNumbers() {
-    if (!this.enabled) return;
-    if (this.awaitingResponse) return;
-
-    this.awaitingResponse = true;
-    this.randomGenerator
-      .GenerateDecimals({ decimalPlaces: 5, n: this.maxCachedNumbers })
-      .then((response) => {
-        Debug.WriteLine(`New numbers:`, response.data);
-        this.randomNumbers = this.randomNumbers.concat(response.data);
-      })
-      .catch((err) => {
-        Debug.WriteLine(`Error: ${err}`);
-      })
-      .finally(() => {
-        this.awaitingResponse = false;
-      });
-  }
-
-  getRandomNumber() {
-    if (!this.enabled) return this.originalRandomFunction();
-    if (!this.randomGenerator || !this.randomGenerator.ApiKey) {
-      if (!this.hasAlerted) {
-        this.hasAlerted = true;
-        ui.notifications.warn("TrueRNG missing API key in settings.");
-      }
-      return this.originalRandomFunction();
+    GenerateQuickToggleButton(enabled) {
+        if (!game.user || !game.user.isGM || this.QuickToggleButton)
+            return;
+        const style = document.createElement("style");
+        style.innerHTML = `
+            .trhidden { display: none; }
+            .trvisible { display: initial; }
+            .trquickbutton {
+                flex: inherit;
+                margin: auto auto;
+                text-align: center;
+                padding-right: 4px;
+            }`;
+        document.body.appendChild(style);
+        const quickToggleButton = document.createElement("a");
+        const outerDiv = document.querySelector("#chat-controls");
+        const firstChild = document.querySelector("#chat-controls > .chat-control-icon");
+        quickToggleButton.id = "TrueRNGQuickToggleButton";
+        quickToggleButton.title = "Toggle the TrueRNG module";
+        quickToggleButton.classList.add("trquickbutton", enabled ? "trvisible" : "trhidden");
+        quickToggleButton.innerHTML = game.settings.get("truerng", "ENABLED") ? "ON" : "OFF";
+        quickToggleButton.addEventListener("click", () => {
+            const isEnabled = game.settings.get("truerng", "ENABLED");
+            game.settings.set("truerng", "ENABLED", !isEnabled);
+            quickToggleButton.innerHTML = isEnabled ? "OFF" : "ON";
+        });
+        outerDiv?.insertBefore(quickToggleButton, firstChild);
+        this.QuickToggleButton = quickToggleButton;
     }
-    if (!this.randomNumbers.length) {
-      this.updateRandomNumbers();
-      return this.originalRandomFunction();
+    UpdateRandomNumbers() {
+        if (!this.Enabled || this.AwaitingResponse)
+            return;
+        this.AwaitingResponse = true;
+        this.RandomGenerator.GenerateDecimals({ decimalPlaces: 5, n: this.MaxCachedNumbers })
+            .then((response) => {
+            this.RandomNumbers = this.RandomNumbers.concat(response.data);
+        })
+            .catch((reason) => Debug.WriteLine(`Random.org error: ${reason}`))
+            .finally(() => this.AwaitingResponse = false);
     }
-
-    let rngFuncRef = new Ref(this.popRandomNumber.bind(this));
-    if (this.preRNGEventHandler) {
-      if (this.preRNGEventHandler(this, rngFuncRef)) {
-        rngFuncRef.Reference = this.originalRandomFunction;
-      }
+    GetRandomNumber() {
+        if (!this.Enabled || !this.RandomGenerator?.ApiKey) {
+            if (!this.HasAlerted) {
+                this.HasAlerted = true;
+                new Dialog({
+                    title: "WARNING MISSING API KEY",
+                    content: "You must set an API key in Module Settings for TrueRNG to function.",
+                    buttons: { ok: { label: "Ok" } },
+                    default: "ok"
+                }).render(true);
+            }
+            return this.OriginalRandomFunction();
+        }
+        if (!this.RandomNumbers.length) {
+            this.UpdateRandomNumbers();
+            return this.OriginalRandomFunction();
+        }
+        let rngFuncReference = new Ref(this.PopRandomNumber.bind(this));
+        if (this.PreRNGEventHandler && this.PreRNGEventHandler(this, rngFuncReference)) {
+            rngFuncReference.Reference = this.OriginalRandomFunction;
+        }
+        if ((this.RandomNumbers.length / this.MaxCachedNumbers) < this.UpdatePoint) {
+            this.UpdateRandomNumbers();
+        }
+        let randomNumber = rngFuncReference.Reference();
+        let randomNumberRef = new Ref(randomNumber);
+        if (this.PostRNGEventHandler) {
+            this.PostRNGEventHandler(this, randomNumberRef);
+        }
+        this.LastRandomNumber = randomNumberRef.Reference;
+        return this.LastRandomNumber;
     }
-    if (this.randomNumbers.length / this.maxCachedNumbers < this.updatePoint) {
-      this.updateRandomNumbers();
+    PopRandomNumber() {
+        const ms = new Date().getTime();
+        const index = ms % this.RandomNumbers.length;
+        let rng = this.RandomNumbers[index];
+        if (rng <= Number.EPSILON)
+            rng = Number.EPSILON;
+        this.RandomNumbers.splice(index, 1);
+        return rng;
     }
-    let random = rngFuncRef.Reference();
-    let randomRef = new Ref(random);
-    if (this.postRNGEventHandler) {
-      this.postRNGEventHandler(this, randomRef);
-    }
-    this.lastRandomNumber = randomRef.Reference;
-    return this.lastRandomNumber;
-  }
-
-  popRandomNumber() {
-    const ms = Date.now();
-    const index = ms % this.randomNumbers.length;
-    let rng = this.randomNumbers[index];
-    if (rng <= Number.EPSILON) rng = Number.EPSILON;
-    this.randomNumbers.splice(index, 1);
-    return rng;
-  }
-
-  generateQuickToggleButton(show) {
-    if (!game.user?.isGM || this.quickToggleButton) return;
-
-    let style = document.createElement("style");
-    style.innerHTML = `
-      .trhidden { display: none; }
-      .trvisible { display: initial; }
-      .trquickbutton {
-        flex: inherit;
-        margin: auto auto;
-        text-align: center;
-        padding-right: 4px;
-      }`;
-    document.body.appendChild(style);
-
-    let quickToggleButton = document.createElement("a");
-    let chatControls = document.querySelector("#chat-controls");
-    let firstChild = document.querySelector("#chat-controls > .chat-control-icon");
-
-    quickToggleButton.id = "TrueRNGQuickToggleButton";
-    quickToggleButton.title = "Toggle TrueRNG";
-    quickToggleButton.classList.add("trquickbutton");
-    quickToggleButton.classList.add(show ? "trvisible" : "trhidden");
-    quickToggleButton.innerHTML = game.settings.get("truerng", "ENABLED") ? "ON" : "OFF";
-
-    quickToggleButton.addEventListener("click", () => {
-      let enabled = game.settings.get("truerng", "ENABLED");
-      game.settings.set("truerng", "ENABLED", !enabled);
-      quickToggleButton.innerHTML = !enabled ? "ON" : "OFF";
-    });
-
-    chatControls?.insertBefore(quickToggleButton, firstChild);
-    this.quickToggleButton = quickToggleButton;
-  }
-
-  toggleQuickButton(show) {
-    if (show) {
-      this.quickToggleButton?.classList.remove("trhidden");
-      this.quickToggleButton?.classList.add("trvisible");
-    } else {
-      this.quickToggleButton?.classList.add("trhidden");
-      this.quickToggleButton?.classList.remove("trvisible");
-    }
-  }
 }
-
-// Initialize on Foundry init
-Hooks.once("init", () => TrueRNGModule.init());
+var trueRNG = new TrueRNG();
+globalThis.TrueRNG = trueRNG;
+Hooks.once('init', () => {
+    trueRNG.OriginalRandomFunction = CONFIG.Dice.randomUniform ?? Math.random;
+    CONFIG.Dice.randomUniform = trueRNG.GetRandomNumber.bind(trueRNG);
+    game.settings.register("truerng", "APIKEY", {
+        name: "Random.org API Key",
+        hint: "Put your developer key from https://api.random.org/dashboard here",
+        scope: "world", config: true, type: String, default: "",
+        onChange: value => trueRNG.UpdateAPIKey(value)
+    });
+    game.settings.register("truerng", "MAXCACHEDNUMBERS", {
+        name: "Max Cached Numbers",
+        hint: "Number of random numbers to cache per client.",
+        scope: "world", config: true, type: Number,
+        range: { min: 5, max: 200, step: 1 },
+        default: 10,
+        onChange: value => trueRNG.MaxCachedNumbers = value
+    });
+    game.settings.register("truerng", "UPDATEPOINT", {
+        name: "Update Point",
+        hint: "Percentage of cache to trigger refetch.",
+        scope: "world", config: true, type: Number,
+        range: { min: 1, max: 100, step: 1 },
+        default: 50,
+        onChange: value => trueRNG.UpdatePoint = value * 0.01
+    });
+    game.settings.register("truerng", "DEBUG", {
+        name: "Print Debug Messages",
+        hint: "Print debug messages to console",
+        scope: "client", config: true, type: Boolean,
+        default: true,
+        onChange: value => Debug.WriteLine(`Debug: ${value}`)
+    });
+    game.settings.register("truerng", "ENABLED", {
+        name: "Enabled",
+        hint: "Enables/Disables the module",
+        scope: "world", config: true, type: Boolean,
+        default: true,
+        onChange: value => trueRNG.Enabled = value
+    });
+    game.settings.register("truerng", "QUICKTOGGLE", {
+        name: "Show Quick Toggle Button",
+        hint: "Toggle ON/OFF above chat",
+        scope: "client", config: true, type: Boolean,
+        default: true,
+        onChange: value => {
+            if (value) {
+                trueRNG.QuickToggleButton?.classList.remove("trhidden");
+                trueRNG.QuickToggleButton?.classList.add("trvisible");
+            }
+            else {
+                trueRNG.QuickToggleButton?.classList.add("trhidden");
+                trueRNG.QuickToggleButton?.classList.remove("trvisible");
+            }
+        }
+    });
+    trueRNG.MaxCachedNumbers = parseInt(game.settings.get("truerng", "MAXCACHEDNUMBERS"));
+    trueRNG.UpdatePoint = game.settings.get("truerng", "UPDATEPOINT") * 0.01;
+    const currentKey = game.settings.get("truerng", "APIKEY");
+    if (currentKey?.length) {
+        LocalStorage.Set("TrueRNG.ApiKey", currentKey);
+        trueRNG.UpdateAPIKey(currentKey);
+    }
+    else if (LocalStorage.Get("TrueRNG.ApiKey", null)) {
+        const savedKey = LocalStorage.Get("TrueRNG.ApiKey");
+        game.settings.set("truerng", "APIKEY", savedKey);
+        trueRNG.UpdateAPIKey(savedKey);
+    }
+    trueRNG.Enabled = game.settings.get("truerng", "ENABLED");
+});
+Hooks.once("renderChatLog", () => {
+    let enabled = true;
+    try {
+        enabled = game.settings.get("truerng", "QUICKTOGGLE");
+    }
+    catch (e) { }
+    trueRNG.GenerateQuickToggleButton(enabled);
+});

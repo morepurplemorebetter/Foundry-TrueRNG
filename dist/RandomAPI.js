@@ -93,4 +93,3 @@ var RandomMethods;
     RandomMethods[RandomMethods["getResult"] = 16] = "getResult";
 })(RandomMethods || (RandomMethods = {}));
 Window["RandomAPI"] = RandomAPI;
-//# sourceMappingURL=RandomAPI.js.map

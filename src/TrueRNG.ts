@@ -8,6 +8,7 @@ import { LocalStorage } from './BrowserConfig.js';
 declare var Hooks;
 declare var game;
 declare var CONFIG;
+declare var Dialog;
 
 export class TrueRNG {
     public RandomNumbers: number[] = [];
@@ -42,7 +43,7 @@ export class TrueRNG {
         if (!game.user || !game.user.isGM || this.QuickToggleButton) return;
 
         const style = document.createElement("style");
-        style.innerHTML = \`
+        style.innerHTML = `
             .trhidden { display: none; }
             .trvisible { display: initial; }
             .trquickbutton {
@@ -50,7 +51,7 @@ export class TrueRNG {
                 margin: auto auto;
                 text-align: center;
                 padding-right: 4px;
-            }\`;
+            }`;
         document.body.appendChild(style);
 
         const quickToggleButton = document.createElement("a");

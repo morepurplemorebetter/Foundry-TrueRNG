@@ -3,7 +3,7 @@ export class Debug {
         try {
             return game.settings.get("TrueRNG", "DEBUG");
         }
-        catch (_a) {
+        catch {
             return true;
         }
     }
@@ -43,4 +43,3 @@ export class Debug {
         }
     }
 }
-//# sourceMappingURL=Debug.js.map

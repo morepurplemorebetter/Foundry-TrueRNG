@@ -13,4 +13,3 @@ export class LocalStorage {
         localStorage.setItem(source, JSON.stringify(value));
     }
 }
-//# sourceMappingURL=BrowserConfig.js.map

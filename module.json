@@ -3,12 +3,17 @@
   "title": "TrueRNG",
   "description": "Use a true random number generator from random.org for dice rolls.",
   "version": "2.1.0",
-  "author": "antipop001 (forked from kidfearless)",
+  "authors": [
+    {
+      "name": "antipop001",
+      "url": "https://github.com/antipop001"
+    }
+  ],
   "compatibility": {
     "minimum": "13",
     "verified": "13"
   },
-  "scripts": ["dist/truerng.js"],
+  "scripts": ["dist/TrueRNG.js"],
   "url": "https://github.com/antipop001/Foundry-TrueRNG",
   "manifest": "https://raw.githubusercontent.com/antipop001/Foundry-TrueRNG/master/module.json",
   "download": "https://github.com/antipop001/Foundry-TrueRNG/archive/refs/heads/master.zip"

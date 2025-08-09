@@ -61,12 +61,12 @@ export class TrueRNG {
         quickToggleButton.id = "TrueRNGQuickToggleButton";
         quickToggleButton.title = "Toggle the TrueRNG module";
         quickToggleButton.classList.add("trquickbutton", enabled ? "trvisible" : "trhidden");
-        quickToggleButton.innerHTML = game.settings.get("truerng", "ENABLED") ? "ON" : "OFF";
+        quickToggleButton.innerHTML = game.settings.get("truerng", "ENABLED") ? "RndON" : "RndOFF";
 
         quickToggleButton.addEventListener("click", () => {
             const isEnabled = game.settings.get("truerng", "ENABLED");
             game.settings.set("truerng", "ENABLED", !isEnabled);
-            quickToggleButton.innerHTML = isEnabled ? "OFF" : "ON";
+            quickToggleButton.innerHTML = isEnabled ? "RndOFF" : "RndON";
         });
 
         if (outerDiv) {

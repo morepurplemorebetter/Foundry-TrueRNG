@@ -1,6 +1,6 @@
 {
   "name": "foundry-truerandom",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "description": "True random number generator integration for Foundry VTT using random.org",
   "main": "dist/truerandom.js",
   "scripts": {

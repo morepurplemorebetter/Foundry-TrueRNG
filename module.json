@@ -2,7 +2,7 @@
   "id": "truerandom",
   "title": "TrueRandom",
   "description": "Use a true random number generator from random.org for dice rolls.",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "authors": [
     {
       "name": "antipop001",
@@ -15,6 +15,6 @@
   },
   "esmodules": ["dist/TrueRandom.js"],
   "url": "https://github.com/antipop001/Foundry-TrueRNG",
-  "manifest": "https://raw.githubusercontent.com/antipop001/Foundry-TrueRNG/master/module.json",
-  "download": "https://github.com/antipop001/Foundry-TrueRNG/archive/refs/heads/master.zip"
+  "manifest": "https://github.com/antipop001/Foundry-TrueRNG/releases/download/v2.3.0/module.json",
+  "download": "https://github.com/antipop001/Foundry-TrueRNG/releases/download/v2.3.0/truerandom.zip"
 }

@@ -15,6 +15,6 @@
   },
   "esmodules": ["dist/TrueRandom.js"],
   "url": "https://github.com/antipop001/Foundry-TrueRNG",
-  "manifest": "https://github.com/antipop001/Foundry-TrueRNG/releases/download/v2.3.0/module.json",
-  "download": "https://github.com/antipop001/Foundry-TrueRNG/releases/download/v2.3.0/truerandom.zip"
+  "manifest": "https://raw.githubusercontent.com/antipop001/Foundry-TrueRNG/master/module.json",
+  "download": "https://github.com/antipop001/Foundry-TrueRNG/archive/refs/heads/master.zip"
 }

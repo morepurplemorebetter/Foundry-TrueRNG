@@ -1,47 +1,115 @@
-# TrueRNG
-This module implements random.org's true random number generator service into the dice rolls of Foundry-VTT. In order to use the module you will need to generate a free api key from https://api.random.org/dashboard
-
-## Tnstallation
-* Install the module using the following manifest url: https://raw.githubusercontent.com/kidfearless/Foundry-TrueRNG/master/module.json
-* As GameMaster go to the "Module Settings" tab inside "Configure Settings" and paste in your api key under "Random.org API Key"
-* Save Changes. The clients will now all start pulling in random numbers from random.org
-
-## Configuration
-`Random.org API Key` - Required in order to function properly. If you don't provide an api key then Foundry's original random number generator is used.
-
-`Max Cached Dice` - This is the amount of random numbers to pull in at a time for each client. The developer api key is limited on how many numbers it can generate in a day. 
-So if you have a large number of players or reload the game a lot throughout the session I recommend keeping this `low`.
-If you are playing a game that requires rolling large quantities of dice then I recommend setting this `high`.
-
-`Update Point` - Every time a dice is rolled the client checks how many cached values it has left. With the default values it will pull in 50(Max Cached Dice) once it falls below 50%(Update Point). 
-In that example at 25 cached dice it will generate 50 more random numbers and add them to the existing cache. Again adjust this value based of the number of rolls you do in your game at once. 
-
-## Implementation Notes
-When the module is loaded it replaces the cached random number generator function in `CONFIG.Dice.randomUniform` with it's own `TrueRNG.GetRandomNumber` 
-as well as caching the original in case of user/server error. It will then generate some server settings and try to grab the current api key. 
-If the api key exists then it makes a request to random.org immediately, otherwise it will wait for an api key to be set before trying again.
-The random numbers are stored in an array and are unique for each client as it turns out that the dice rng function is client sided.
-Once the client rolls a dice it will get the current time in milliseconds and modulus it by the length of the current cached values. 
-I did this because I didn't like the idea of a players role being predetermined at the start of each game. 
-This at least makes it so that the rolls you get are determined at the start, the order that you get them is random.
-
-
-If you like this repo and want to support me you can always buy me a pizza 😁
-<a href="https://www.buymeacoffee.com/kidfearless" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-violet.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
 # TrueRNG for Foundry VTT
 
-This module replaces Foundry's built-in RNG with true random numbers from [random.org](https://random.org).
-
-## Installation
-
-Use this manifest URL:
-```
-https://raw.githubusercontent.com/antipop001/Foundry-TrueRNG/master/module.json
-```
+This module replaces Foundry VTT's built-in pseudo-random number generator with true random numbers from [random.org](https://random.org), providing atmospheric noise-based randomness for all dice rolls.
 
 ## Features
 
-- Uses `random.org` API for atmospheric randomness
-- Caches results to reduce API load
-- Toggle module via UI button
-- Optional API key usage
+- **True Randomness**: Uses random.org's atmospheric noise-based random number generation
+- **Seamless Integration**: Automatically replaces all dice rolls with true random numbers
+- **Smart Caching**: Fetches numbers in batches to minimize API usage
+- **GM Controls**: Quick toggle button and comprehensive settings
+- **Seed Transparency**: Optional display of fetched random seeds in chat
+- **Foundry v13 Compatible**: Updated for the latest Foundry VTT version
+- **Automatic Fallback**: Uses standard randomness if API is unavailable
+
+## Installation
+
+1. Install the module using this manifest URL in Foundry VTT:
+   ```
+   https://raw.githubusercontent.com/antipop001/Foundry-TrueRNG/master/module.json
+   ```
+
+2. Get a free API key from [random.org dashboard](https://api.random.org/dashboard)
+
+3. As Game Master, go to **Game Settings → Module Settings → TrueRNG**
+
+4. Paste your API key in the **"Random.org API Key"** field
+
+5. Save changes - all dice rolls will now use true randomness!
+
+## Configuration
+
+### Core Settings
+
+- **Random.org API Key** (Required): Your API key from random.org dashboard
+- **Enabled**: Toggle TrueRNG on/off globally
+- **Max Cached Numbers** (5-200): Number of random values to fetch per batch
+- **Update Point** (1-100%): Cache refill threshold percentage
+
+### Display Options
+
+- **Show Quick Toggle Button**: Display RndON/RndOFF button above chat (GM only)
+- **Show Seeds in Chat**: Display fetched random seeds as GM whispers for transparency
+- **Print Debug Messages**: Enable console logging for troubleshooting
+
+## How It Works
+
+TrueRNG operates transparently by replacing Foundry's core random number generator (`CONFIG.Dice.randomUniform`). When enabled:
+
+1. **Fetches** batches of true random numbers from random.org
+2. **Caches** them locally for performance
+3. **Uses** them for all dice rolls (attack rolls, damage, skill checks, etc.)
+4. **Refills** cache automatically when running low
+5. **Falls back** to standard randomness if API issues occur
+
+## API Usage Optimization
+
+The free random.org developer API has daily limits. TrueRNG optimizes usage by:
+
+- **Batch fetching**: Gets multiple numbers per API call
+- **Smart caching**: Only fetches when cache is below threshold
+- **Timestamp indexing**: Uses current time to randomize which cached number is used
+
+### Recommendations
+
+- **Small groups/light usage**: Keep Max Cached Numbers low (5-20)
+- **Large groups/heavy dice games**: Increase Max Cached Numbers (50-100)
+- **Frequent page reloads**: Lower cache size to reduce waste
+
+## Verification
+
+To verify TrueRNG is working:
+
+1. Enable **"Show Seeds in Chat"** to see fetched random values
+2. Check browser console for TrueRNG debug messages
+3. Look for **RndON** button above chat (GMs only)
+4. Test with: `console.log(TrueRNG.RandomNumbers.length)` in browser console
+
+## Compatibility
+
+- **Foundry VTT**: v13+ (uses modern ES modules)
+- **Systems**: All systems (operates at core dice level)
+- **Modules**: Compatible with other modules
+
+## Implementation Notes
+
+TrueRNG enhances randomness without changing gameplay:
+
+- **Invisible to players**: Dice interface looks identical
+- **Works with all systems**: PF2e, D&D 5e, etc.
+- **Maintains game balance**: True randomness vs. pseudo-randomness
+- **Session persistent**: Cache survives page refreshes
+
+## Troubleshooting
+
+**No settings visible**: Ensure module is enabled and you're logged in as GM
+
+**Button not showing**: Only GMs see the toggle button, and it requires chat interface
+
+**Seeds not displaying**: Enable "Show Seeds in Chat" and check GM whispers
+
+**API errors**: Verify API key and check daily quota at random.org
+
+## Credits
+
+- **Original Author**: kidfearless
+- **Current Maintainer**: antipop001
+- **API Provider**: [RANDOM.ORG](https://random.org)
+
+## Support
+
+If you encounter issues, please report them on the [GitHub repository](https://github.com/antipop001/Foundry-TrueRNG).
+
+---
+
+*Experience true randomness in your tabletop adventures with atmospheric noise from random.org!*

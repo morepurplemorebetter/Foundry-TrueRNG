@@ -1,4 +1,4 @@
-# TrueRNG for Foundry VTT
+# TrueRandom for Foundry VTT
 
 This module replaces Foundry VTT's built-in pseudo-random number generator with true random numbers from [random.org](https://random.org), providing atmospheric noise-based randomness for all dice rolls.
 
@@ -21,7 +21,7 @@ This module replaces Foundry VTT's built-in pseudo-random number generator with 
 
 2. Get a free API key from [random.org dashboard](https://api.random.org/dashboard)
 
-3. As Game Master, go to **Game Settings → Module Settings → TrueRNG**
+3. As Game Master, go to **Game Settings → Module Settings → TrueRandom**
 
 4. Paste your API key in the **"Random.org API Key"** field
 
@@ -32,7 +32,7 @@ This module replaces Foundry VTT's built-in pseudo-random number generator with 
 ### Core Settings
 
 - **Random.org API Key** (Required): Your API key from random.org dashboard
-- **Enabled**: Toggle TrueRNG on/off globally
+- **Enabled**: Toggle TrueRandom on/off globally
 - **Max Cached Numbers** (5-200): Number of random values to fetch per batch
 - **Update Point** (1-100%): Cache refill threshold percentage
 
@@ -44,7 +44,7 @@ This module replaces Foundry VTT's built-in pseudo-random number generator with 
 
 ## How It Works
 
-TrueRNG operates transparently by replacing Foundry's core random number generator (`CONFIG.Dice.randomUniform`). When enabled:
+TrueRandom operates transparently by replacing Foundry's core random number generator (`CONFIG.Dice.randomUniform`). When enabled:
 
 1. **Fetches** batches of true random numbers from random.org
 2. **Caches** them locally for performance
@@ -54,7 +54,7 @@ TrueRNG operates transparently by replacing Foundry's core random number generat
 
 ## API Usage Optimization
 
-The free random.org developer API has daily limits. TrueRNG optimizes usage by:
+The free random.org developer API has daily limits. TrueRandom optimizes usage by:
 
 - **Batch fetching**: Gets multiple numbers per API call
 - **Smart caching**: Only fetches when cache is below threshold
@@ -68,12 +68,12 @@ The free random.org developer API has daily limits. TrueRNG optimizes usage by:
 
 ## Verification
 
-To verify TrueRNG is working:
+To verify TrueRandom is working:
 
 1. Enable **"Show Seeds in Chat"** to see fetched random values
-2. Check browser console for TrueRNG debug messages
+2. Check browser console for TrueRandom debug messages
 3. Look for **RndON** button above chat (GMs only)
-4. Test with: `console.log(TrueRNG.RandomNumbers.length)` in browser console
+4. Test with: `console.log(TrueRandom.RandomNumbers.length)` in browser console
 
 ## Compatibility
 
@@ -83,7 +83,7 @@ To verify TrueRNG is working:
 
 ## Implementation Notes
 
-TrueRNG enhances randomness without changing gameplay:
+TrueRandom enhances randomness without changing gameplay:
 
 - **Invisible to players**: Dice interface looks identical
 - **Works with all systems**: PF2e, D&D 5e, etc.

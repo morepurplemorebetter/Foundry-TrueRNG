@@ -1,4 +1,4 @@
-import { TrueRNG as rngType } from './TrueRNG.js';
+import { TrueRandom as rngType } from './TrueRandom.js';
 import { Debug } from './Debug.js';
 import { RandomAPI } from './RandomAPI.js';
 // import { Hooks } from './Foundry-Types/Hooks';

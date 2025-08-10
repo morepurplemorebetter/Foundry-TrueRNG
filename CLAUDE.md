@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-TrueRNG is a Foundry VTT module that replaces the built-in random number generator with true random numbers from random.org. The module integrates with Foundry's dice system by hijacking `CONFIG.Dice.randomUniform` and provides a caching mechanism to reduce API calls.
+TrueRandom is a Foundry VTT module that replaces the built-in random number generator with true random numbers from random.org. The module integrates with Foundry's dice system by hijacking `CONFIG.Dice.randomUniform` and provides a caching mechanism to reduce API calls.
 
 ## Development Commands
 
@@ -17,7 +17,7 @@ No test suite, linting, or other development scripts are configured.
 
 ### Core Components
 
-- **TrueRNG.ts** - Main module class that manages random number generation, caching, API integration, and Foundry VTT hooks
+- **TrueRandom.ts** - Main module class that manages random number generation, caching, API integration, and Foundry VTT hooks
 - **RandomAPI.ts** - HTTP client for random.org's JSON-RPC API with error handling and quota tracking
 - **JsonRPC.ts** - JSON-RPC request/response wrapper classes for API communication
 - **interfaces.ts** - TypeScript interfaces defining random.org API parameters and response structures
@@ -33,7 +33,7 @@ No test suite, linting, or other development scripts are configured.
 ### Data Flow
 
 1. Module initializes and replaces Foundry's RNG function
-2. When dice are rolled, `TrueRNG.GetRandomNumber()` is called
+2. When dice are rolled, `TrueRandom.GetRandomNumber()` is called
 3. If cache is empty or API key missing, falls back to `Math.random()`
 4. Random numbers are fetched from random.org in batches and cached locally
 5. Numbers are consumed from cache using timestamp-based indexing for unpredictability
@@ -51,4 +51,4 @@ The module registers several Foundry VTT settings:
 
 ## Build Output
 
-The TypeScript compiler outputs to `dist/truerng.js` which is the main script file referenced in `module.json`.
+The TypeScript compiler outputs to `dist/truerandom.js` which is the main script file referenced in `module.json`.

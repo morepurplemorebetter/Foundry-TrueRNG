@@ -1,7 +1,7 @@
 export class Debug {
     static get Enabled() {
         try {
-            return game.settings.get("TrueRNG", "DEBUG");
+            return game.settings.get("TrueRandom", "DEBUG");
         }
         catch {
             return true;
@@ -10,10 +10,10 @@ export class Debug {
     static WriteLine(message, ...params) {
         if (Debug.Enabled) {
             if (params.length) {
-                console.log("TrueRNG | " + message, params);
+                console.log("TrueRandom | " + message, params);
             }
             else {
-                console.log("TrueRNG | " + message);
+                console.log("TrueRandom | " + message);
             }
         }
     }

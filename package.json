@@ -1,8 +1,8 @@
 {
-  "name": "foundry-truerng",
+  "name": "foundry-truerandom",
   "version": "2.2.0",
   "description": "True random number generator integration for Foundry VTT using random.org",
-  "main": "dist/truerng.js",
+  "main": "dist/truerandom.js",
   "scripts": {
     "build": "tsc"
   },

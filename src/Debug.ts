@@ -5,7 +5,7 @@ export class Debug
 	{
 		try
 		{
-			return game.settings.get("TrueRNG", "DEBUG");
+			return game.settings.get("TrueRandom", "DEBUG");
 		}
 		catch
 		{
@@ -19,11 +19,11 @@ export class Debug
 		{
 			if(params.length)
 			{
-				console.log("TrueRNG | " + message, params);
+				console.log("TrueRandom | " + message, params);
 			}
 			else
 			{
-				console.log("TrueRNG | " + message);
+				console.log("TrueRandom | " + message);
 			}
 		}
 	}

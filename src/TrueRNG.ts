@@ -9,6 +9,7 @@ declare var Hooks;
 declare var game;
 declare var CONFIG;
 declare var Dialog;
+declare var ChatMessage;
 
 export class TrueRNG {
     public RandomNumbers: number[] = [];
@@ -82,6 +83,22 @@ export class TrueRNG {
         this.RandomGenerator!.GenerateDecimals({ decimalPlaces: 5, n: this.MaxCachedNumbers })
             .then((response) => {
                 this.RandomNumbers = this.RandomNumbers.concat(response.data);
+                
+                // Show seeds in chat if enabled
+                if (game.settings.get("truerng", "SHOWSEEDS")) {
+                    const seedList = response.data.join(", ");
+                    const message = `<div style="border: 1px solid #444; padding: 8px; margin: 4px 0; background: rgba(0,0,0,0.1);">
+                        <strong>🎲 TrueRNG Seeds Fetched:</strong><br>
+                        <small style="font-family: monospace;">${seedList}</small><br>
+                        <em style="color: #888; font-size: 11px;">Retrieved ${response.data.length} true random seeds from random.org</em>
+                    </div>`;
+                    
+                    ChatMessage.create({
+                        content: message,
+                        whisper: game.users.filter(u => u.isGM).map(u => u.id),
+                        speaker: { alias: "TrueRNG System" }
+                    });
+                }
             })
             .catch((reason) => Debug.WriteLine(`Random.org error: ${reason}`))
             .finally(() => this.AwaitingResponse = false);
@@ -198,6 +215,13 @@ Hooks.once('init', () => {
                 trueRNG.QuickToggleButton?.classList.remove("trvisible");
             }
         }
+    });
+
+    game.settings.register("truerng", "SHOWSEEDS", {
+        name: "Show Seeds in Chat",
+        hint: "Display fetched random seeds in chat when retrieved from random.org",
+        scope: "world", config: true, type: Boolean,
+        default: false
     });
 
     trueRNG.MaxCachedNumbers = parseInt(game.settings.get("truerng", "MAXCACHEDNUMBERS"));

@@ -2,7 +2,7 @@
   "id": "truerng",
   "title": "TrueRNG",
   "description": "Use a true random number generator from random.org for dice rolls.",
-  "version": "2.1.2",
+  "version": "2.2.0",
   "authors": [
     {
       "name": "antipop001",
